@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1
@@ -93,7 +94,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             int i = 0;
-            
+
             foreach (var entry in user32.map)
             {
                 var c = ColorTranslator.FromWin32((int)user32.GetSysColor(entry.Value));
@@ -102,8 +103,19 @@ namespace WindowsFormsApp1
                     BackColor = c,
                     BorderStyle = BorderStyle.Fixed3D,
                     Top = i * 40,
-                    Left = 180,
+                    Left = 240,
                 };
+
+                var t = new Label() { Text = name, Top = i * 40, Width = 240, Height = 30 };
+                var h = new Label()
+                {
+                    Text = ColorTranslator.ToHtml(Color.FromArgb(c.ToArgb())),
+                    Top = i * 40,
+                    Width = 120,
+                    Height = 30,
+                    Left = 320
+                };
+
                 p.Click += (_1, _2) => {
                     ColorDialog cd = new ColorDialog();
                     cd.Color = c;
@@ -111,15 +123,17 @@ namespace WindowsFormsApp1
                     if (cd.ShowDialog() == DialogResult.OK)
                     {
                         var res = cd.Color;
-                        user32.SetSysColors(1, 
-                            new int[] { entry.Value }, 
+                        user32.SetSysColors(1,
+                            new int[] { entry.Value },
                             new uint[] { (uint)ColorTranslator.ToWin32(res) });
                         p.BackColor = res;
+                        h.Text = ColorTranslator.ToHtml(Color.FromArgb(res.ToArgb()));
                     }
                 };
-                var t = new Label() { Text = name, Top = i*40, Width = 160, Height = 30 };
+
                 panel1.Controls.Add(t);
                 panel1.Controls.Add(p);
+                panel1.Controls.Add(h);
                 i++;
             }
         }
